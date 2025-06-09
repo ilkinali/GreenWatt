@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenWatt – Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    .card { background-color: #1a2a3f; border-radius: 12px; padding: 1.5rem; color: white; }
+    .sidebar { background-color: #0f172a; }
+    .highlight { color: #22c55e; }
+    .intro { background-image: url('windfarms.jpg'); background-size: cover; background-position: center; height: 100vh; transition: opacity 0.5s ease; }
+    .hidden-slide { transform: translateX(100%); opacity: 0; }
+    .visible-slide { transform: translateX(0); opacity: 1; transition: all 0.6s ease-in-out; }
+  </style>
+</head>
+<body>
+  <section id="intro" class="intro flex flex-col justify-center items-center text-white text-center">
+    <h1 class="text-5xl font-bold mb-4">GreenWatt</h1>
+    <p class="text-xl mb-6">Control your power with clean energy.<br>Analyze and save energy for your home and office.</p>
+    <button id="getStartedBtn" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded text-white">Get Started</button>
+  </section>
+
+  <div id="g_id_onload"
+       data-client_id="332899016010-o748kjkdbkc3j7oo8qdjp64d095i5m96.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false">
+  </div>
+  <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
+
+  <div id="userProfile" class="hidden text-right px-6 py-2 text-white">
+    <p id="userName" class="font-semibold"></p>
+    <img id="userImage" src="" alt="User Photo" class="w-10 h-10 rounded-full inline-block"/>
+    <button onclick="signOut()" class="ml-2 text-sm text-red-400 hover:underline">Sign Out</button>
+  </div>
+
+  <div id="dashboard" class="flex min-h-screen hidden-slide">
+    <aside class="sidebar w-64 p-6 text-white space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold">GreenWatt</h2>
+        <p class="text-xs text-pink-500">BETA</p>
+      </div>
+      <nav class="space-y-4">
+        <a href="#" class="block hover:text-green-400" id="navDashboard">📊 Dashboard</a>
+        <a href="#" class="block hover:text-green-400" id="navCost">💰 Cost</a>
+        <a href="#" class="block hover:text-green-400" id="navAppliances">🔌 Appliances</a>
+        <a href="#" class="block hover:text-green-400" id="navRooms">🏠 Usage by Rooms</a>
+        <a href="#" class="block hover:text-green-400" id="navEmissions">🌱 Emissions</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 space-y-6">
+      <div class="flex justify-between items-center">
+        <select id="countrySelect" class="text-black px-3 py-1 rounded">
+          <option value="AZ">Azərbaycan</option>
+          <option value="US">United States</option>
+          <option value="TR">Türkiye</option>
+          <option value="FR">France</option>
+          <option value="DE">Deutschland</option>
+          <option value="IT">Italia</option>
+          <option value="ES">España</option>
+        </select>
+        <h1 class="text-white text-3xl font-bold">Energy Dashboard</h1>
+        <div class="text-white">June 2024</div>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" id="addTitle">Add New Appliance</h2>
+        <form id="applianceForm" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div>
+            <label class="block mb-1" for="deviceInput" id="deviceLabel">Device Name</label>
+            <input type="text" id="deviceInput" class="w-full px-3 py-2 rounded text-black" placeholder="e.g. Hair Dryer" required />
+          </div>
+          <div>
+            <label class="block mb-1" for="wattageInput" id="wattageLabel">Wattage (W)</label>
+            <input type="number" id="wattageInput" class="w-full px-3 py-2 rounded text-black" required />
+          </div>
+          <div>
+            <label class="block mb-1" for="hoursInput" id="hoursLabel">Daily Usage (Hours)</label>
+            <input type="number" id="hoursInput" class="w-full px-3 py-2 rounded text-black" step="0.1" required />
+          </div>
+          <button type="submit" id="submitBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mt-4 md:mt-0">Add & Recalculate</button>
+        </form>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-2" id="costTitle">Cost Predicted</h2>
+          <canvas id="costChart"></canvas>
+        </div>
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-2" id="changeTitle">Change in Cost</h2>
+          <canvas id="changeChart"></canvas>
+        </div>
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-2" id="usageTitle">Usage Estimate</h2>
+          <canvas id="usageChart"></canvas>
+        </div>
+        <div class="card col-span-1 md:col-span-2">
+          <h2 class="text-lg font-semibold mb-2" id="activeTitle">Active Appliances</h2>
+          <canvas id="applianceChart"></canvas>
+        </div>
+        <div class="card">
+          <h2 class="text-lg font-semibold mb-2" id="intensityTitle">Energy Intensity</h2>
+          <canvas id="energyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-2" id="footprintTitle">Carbon Footprint</h2>
+        <div id="carbonFootprint" class="text-sm mb-4"></div>
+        <div id="savingsTips" class="text-sm"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function handleCredentialResponse(response) {
+      const data = jwt_decode(response.credential);
+      document.querySelector('.g_id_signin').style.display = 'none';
+      document.getElementById('userProfile').classList.remove('hidden');
+      document.getElementById('userName').textContent = data.name;
+      document.getElementById('userImage').src = data.picture;
+    }
+
+    function signOut() {
+      document.getElementById('userProfile').classList.add('hidden');
+      document.querySelector('.g_id_signin').style.display = 'block';
+    }
+
+    document.getElementById('getStartedBtn').addEventListener('click', () => {
+      document.getElementById('intro').style.display = 'none';
+      const dashboard = document.getElementById('dashboard');
+      dashboard.classList.remove('hidden-slide');
+      dashboard.classList.add('visible-slide');
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+  <script src="translation.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/* ====== style.css ====== */
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+canvas {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.neumorphic {
+  background: #e0e0e0;
+  box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+  border-radius: 10px;
+}
+
+.neumorphic-input {
+  background: #e0e0e0;
+  box-shadow: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
+  border: none;
+  outline: none;
+}
+
+.neumorphic-button {
+  background: #e0e0e0;
+  box-shadow: 4px 4px 8px #bebebe, -4px -4px 8px #ffffff;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.neumorphic-button:hover {
+  box-shadow: 2px 2px 4px #bebebe, -2px -2px 4px #ffffff;
+}
