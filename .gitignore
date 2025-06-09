@@ -1,0 +1,25 @@
+# Node.js dependencies (in case backend is added in the future)
+node_modules/
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode configuration
+.vscode/
+
+# Log files
+*.log
+
+# Operating system and IDE-related files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Just in case – backup and temporary files
+*.bak
+*.tmp
